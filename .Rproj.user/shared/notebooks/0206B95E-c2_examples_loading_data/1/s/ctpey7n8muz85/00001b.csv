@@ -1,0 +1,33 @@
+"0","# attach Auto"
+"0","attach(Auto)"
+"2","The following object is masked _by_ .GlobalEnv:
+
+    cylinders
+
+"
+"2","The following objects are masked from Auto (pos = 3):
+
+    acceleration, cylinders, displacement, horsepower, mpg, name, origin, weight, year
+
+"
+"2","The following objects are masked from Auto (pos = 4):
+
+    acceleration, cylinders, displacement, horsepower, mpg, name, origin, weight, year
+
+"
+"2","The following objects are masked from Auto (pos = 5):
+
+    acceleration, cylinders, displacement, horsepower, mpg, name, origin, weight, year
+
+"
+"2","The following objects are masked from Auto (pos = 6):
+
+    acceleration, cylinders, displacement, horsepower, mpg, name, origin, weight, year
+
+"
+"0","# change cylinders to a qualitative variable"
+"0","cylinders <- as.factor(cylinders)"
+"0","# plot relationship between cylinders and mpg"
+"0","plot(cylinders, mpg,"
+"0","     col=""red"", varwidth=TRUE,"
+"0","     xlab=""cylinders"", ylab=""MPG"")"

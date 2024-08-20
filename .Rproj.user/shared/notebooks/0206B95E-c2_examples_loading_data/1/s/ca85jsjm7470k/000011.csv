@@ -1,0 +1,3 @@
+"0","# attach Auto to make the variables accessible by name"
+"0","#attach(AUto)"
+"0","#plot(cylinders,mpg)"

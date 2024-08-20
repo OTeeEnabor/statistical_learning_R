@@ -1,0 +1,8 @@
+"0","# remove the missing values in Auto using the na.omit method"
+"0","Auto <- na.omit(Auto)"
+"0","dim(Auto)"
+"1","[1]"
+"1"," 392"
+"1","   9"
+"1","
+"

@@ -1,0 +1,4 @@
+"0","identify(horsepower, mpg, name)"
+"2","Error in identify.default(horsepower, mpg, name) : 
+  plot.new has not been called yet
+"

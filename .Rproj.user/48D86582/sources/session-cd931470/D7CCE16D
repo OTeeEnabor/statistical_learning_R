@@ -1,0 +1,27 @@
+{
+    "id": "D7CCE16D",
+    "path": "~/Learning/R/statistical_learning/notebooks/c2_examples_loading_data.Rmd",
+    "project_path": "notebooks/c2_examples_loading_data.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1724138471299.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "83,0",
+        "scrollLine": "68",
+        "chunk_output_type": "inline"
+    },
+    "folds": "0|3|4|0|\n13|6|18|0|\n20|6|26|0|\n",
+    "lastKnownWriteTime": 1724147255,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1724147255475,
+    "read_only": false,
+    "read_only_alternatives": []
+}

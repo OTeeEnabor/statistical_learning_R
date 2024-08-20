@@ -1,0 +1,8 @@
+"0","# display the current working directory"
+"0","getwd()"
+"1","[1]"
+"1"," ""C:/Users/user/Documents/Learning/R/statistical_learning/notebooks"""
+"1","
+"
+"0","# read "
+"0","read.table(""../data/Auto.data"")"

@@ -1,0 +1,90 @@
+---
+title: "Intro_to_statitical_learning_with_R_c2_exercises"
+output:
+  html_notebook: default
+---
+# Loading Data
+The first step in most data analyses problem is importing a data set into `R`. The `read.table()` function is a primary way to do this. Conversely, the `write.table()` function is used to export data. 
+
+In order to import data, `R` must know where the data reside - check which directory you are working in and navigate from there to where the data is located.
+
+## Example: Auto data set
+In this example we load an `Auto` data set which is part of the `ISLR2` library. Using the `read.table()`
+function, the data set, which is stored in a text file,is loaded into R and stored in a **data frame** format. The `View()` function can be used to represent the data in a spreadsheet-like format. The `head()` function can also be used to view the first few observations in the data set.  
+```{r}
+# display the current working directory
+getwd()
+# read in the Auto data
+Auto <- read.table("../data/Auto.data")
+```
+From the output above, it is ecident that the data set has not been loaded correctly - `R` has included the variable names as part of the data. To rectify this, use the option `header=T` or `header=TRUE`. This tells the `R` that the first line of the data set contains the variable names. To handle missing data, which is a common occurrence in data analysis, the `na.strings` method in `R` replaces any occurrence of a particular sequence of strings with a missing value represented as `na`. The `stringsAsFactors` method is used to treat any variable containing character strings as qualitative variable and each distinct character string represents a distinct level for the qualitative variable.
+```{r}
+Auto <- read.table("../data/Auto.data", header=TRUE, na.strings="?", stringsAsFactors = TRUE)
+# view the Auto data frame
+View(Auto)
+# check the dimensions of the dataset - number of observations and variables
+dim(Auto)
+```
+The Auto data set has 397 observations, and 9 variables. Missing values in a data set is common, there are several ways to check to handle missing values and is a study on its own.The are 5 missing values in this data set, this value is less than 10% of the data set so these observations can be ommited. 
+```{r}
+# remove the missing values in Auto using the na.omit method
+Auto <- na.omit(Auto)
+dim(Auto)
+```
+The `names` function can be used to check the variable names.
+```{r}
+names(Auto)
+```
+The `summary()` function is used to provide a summary statistics of the data frame.  
+```{r}
+summary(Auto)
+```
+## EDA - Graphical and Numerical
+```{r}
+# plot a scatterplot to show the relationship between cyclinders and mpg
+plot(Auto$cylinders, Auto$mpg)
+# attach Auto to make the variables accessible by name
+#attach(AUto)
+#plot(cylinders,mpg)
+```
+The `attach()` function allows `R` to access the variables in the `Auto` data frame by name (without having to reference `Auto`) Also from the plot above, cylinders has 5 distinct values, therefore it can be treated as a qualitative variable - where each distinct value represents a category of cylinder or number of cylinders. This change from quantitative to qualitative can be done using the `as.factor()` function.
+
+```{r}
+# attach Auto
+attach(Auto)
+# change cylinders to a qualitative variable
+cylinders <- as.factor(cylinders)
+# plot relationship between cylinders and mpg
+plot(cylinders, mpg,
+     col="red", varwidth=TRUE,
+     xlab="cylinders", ylab="MPG")
+```
+Since `cylinders` is now a qualitative variable, the scatter plot is no longer the most appropriate visualisation to represent the relationship between `cylinders` and `mpg`. The `plot` function has chosen a `box-whiskers` plot to show this relationship. From the plot, it is evident that there are some `outliers` in some of the cylinder levels.
+
+The sample distribution of MPG above can be represented in a histogram plot using the `hist()` function. 
+```{r}
+hist(mpg, col=2, breaks=15)
+```
+The `pairs()` function creates a scatterplot matrix - a scatterplot for every pair of variables, however a subset of the variables can also be selected.
+
+```{r}
+
+pairs(Auto)
+```
+
+```{r}
+pairs(
+  ~mpg + displacement + horsepower + weight + acceleration,
+  data=Auto
+)
+```
+```{r}
+plot(horsepower, mpg)
+identify(horsepower, mpg, name)
+
+```
+```{r}
+
+```
+
+

@@ -1,0 +1,2 @@
+"0","# plot a scatterplot to show the relationship between cyclinders and mpg"
+"0","plot(Auto$cylinders, Auto$mpg)"
