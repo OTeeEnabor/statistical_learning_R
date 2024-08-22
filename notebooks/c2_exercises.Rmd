@@ -39,6 +39,14 @@ c. **We are interested in predicting the % change in the USD/Euro exchange rate 
 
 This is a regression problem - quantitative continuous response variable. *n* is 52. p is *3*.
 
+
+## Question 3
+
+a. Provide sketch of bias, variance, training error, test error, and Bayes error curves on a single plot. x-axis is flexibility and y-axus represents values of each curve.
+
+b. Explain why each of the five curves has the shape displayed in part a.
+- bias: this represents the error approximating a real-life problem which can be complex with a simple model. The less flexible the model the more bias introduced into the problem. Therefore bias will tend to decrease as we increase model flexibility because more flexible models attempt to capture/represent the complexity in the relationships between response and predictiors. 
+- variance: the variance will tend to increase as the flexibility increases. More flexible methods are sensitive to change in the observations that they model. 
 ```{r}
 library(ISLR)
 data("College")
