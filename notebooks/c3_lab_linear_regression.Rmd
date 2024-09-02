@@ -1,0 +1,13 @@
+---
+title: "Intro_to_statitical_learning_with_R_c3_labexercises"
+output:
+  html_notebook: default
+---
+```{r}
+library(MASS)
+library(ISLR2)
+```
+# Simple Linear Regression
+The `ISLR2` library contains the `Boston` data set, which records medv (median house value) for 506 census tracts in Boston. We will seek to predict
+`medv` using 12 predictors such as `rm` (average number of rooms per house), `age` (proportion of owner-occupied units built prior to 1940) and `lstat` (per
+cent of households with low socioeconomic status).
