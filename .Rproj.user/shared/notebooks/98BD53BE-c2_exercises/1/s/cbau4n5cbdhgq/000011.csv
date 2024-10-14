@@ -1,4 +1,0 @@
-"0","par(mfrow=c(4,4), mar=c(2,2,1,0))"
-"0",""
-"0","for (i in 2:17)"
-"0","  boxplot(College[, i] ~ College[, 1], xlab="""", main=colnames(College)[i])"

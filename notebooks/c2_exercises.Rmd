@@ -45,25 +45,92 @@ This is a regression problem - quantitative continuous response variable. *n* is
 a. Provide sketch of bias, variance, training error, test error, and Bayes error curves on a single plot. x-axis is flexibility and y-axus represents values of each curve.
 
 b. Explain why each of the five curves has the shape displayed in part a.
-- bias: this represents the error approximating a real-life problem which can be complex with a simple model. The less flexible the model the more bias introduced into the problem. Therefore bias will tend to decrease as we increase model flexibility because more flexible models attempt to capture/represent the complexity in the relationships between response and predictiors. 
-- variance: the variance will tend to increase as the flexibility increases. More flexible methods are sensitive to change in the observations that they model. 
-```{r}
-library(ISLR)
-data("College")
-```
-- Use the `pairs()` function to produce a scatterplot matrix of the first ten columns or variables of the data.    
+- bias: this represents the error approximating a real-life problem which can be complex with a simple model. The less flexible the model the more bias introduced into the problem. Therefore bias will tend to decrease as we increase model flexibility because more flexible models attempt to capture/represent the complexity in the relationships between response and predictors. 
+- variance: the variance will tend to increase as the flexibility increases. More flexible methods are sensitive to change in the observations that they model.
+
 
 ```{r}
-pairs(College[, 1:10])
+library(ISLR)
+library(ggplot2)
+library(dplyr)
+#library(plotly)
 ```
-- Use the `plot()` function to produce side by side boxplots of `Outstate` vs `Private`.
+
+Read in the `College` data set with the `read.csv()` function.
+ 
 ```{r}
+# read in the College data set
+college <- read.csv("../data/College.csv")
+```
+
+```{r}
+# give each row name corresponding to the appropriate college name
+rownames(college) <- college[,1]
+```
+```{r}
+# remove the first column where college names stored
+college <- college[,-1]
+```
+
+```{r}
+# use summary function to produce numerical summary of the variables in the data set
+summary(college)
+```
+
+
+- Use the `pairs()` function to produce a scatter plot matrix of the first ten columns or variables of the data.    
+
+```{r}
+# create a scatter plot matrix with the first 10 predictors in college datasec
+pairs(college[, 2:10])
+```
+- Use the `plot()` function to produce side by side box plots of `Outstate` vs `Private`.
+```{r}
+# create multiple plots - 4 rows and 4 columns with margin - top right bottom left
 par(mfrow=c(4,4), mar=c(2,2,1,0))
 
 for (i in 2:17)
-  boxplot(College[, i] ~ College[, 1], xlab="", main=colnames(College)[i])
+  boxplot(college[, i] ~ college[, 1], xlab="", main=colnames(college)[i])
+```
+- Create a new qualitative variable - `Elite`, by *binning* the top10perv variable.
+
+```{r}
+# create replicated vector of No with length of college
+Elite <- rep("No", nrow(college))
+# change elite value to yes if Top10Perc above 50
+Elite[college$Top10perc > 50] <- "Yes"
+# change Elite to a set of distinct qualitative values - factor
+Elite <- as.factor(Elite)
+# add Elite to College as a categorical variable
+college <- data.frame(college, Elite)
+summary(college$Elite)
+```
+Based on summary of `Elite` column, there are **78** elite universities in the `College` data set. 
+
+Use the 'plot()` function to create side-by-side boxplots of `Outstate` versus `Elite`
+
+```{r}
+# create multiple plots - 4 rows and 4 columns with margin - top right bottom left
+
+plot(college$Outstate~ college$Elite)
 ```
 
+
+```{r}
+par(mfrow=c(2,2))
+hist(college$Apps, breaks = 5)
+hist(college$Apps, breaks = 10)
+hist(college$Apps, breaks = 20)
+hist(college$Apps, breaks = 40)
+```
+
+```{r}
+par(mfrow=c(2,2))
+hist(college$PhD, breaks = 5)
+hist(college$PhD, breaks = 10)
+hist(college$PhD, breaks = 20)
+hist(college$PhD, breaks = 40)
+```
 
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.

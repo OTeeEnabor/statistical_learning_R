@@ -1,0 +1,24 @@
+```{r}
+library(ISLR)
+library(ISLR2)
+
+```
+```{r}
+head(Default)
+```
+```{r}
+write.csv(Default, "default.csv", row.names=FALSE)
+```
+
+```{r}
+# convert default class to factor
+default <- Default
+default$default <- factor(default$default)
+# define colours for each class
+colours <- c("blue", "red")
+plot(Default$balance, Default$income, col=colours[default$default],
+     main="Relationship Between Income and Credit Balance",
+     xlab="Balance",
+     ylab="Income")
+```
+

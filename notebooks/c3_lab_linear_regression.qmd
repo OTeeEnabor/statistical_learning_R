@@ -1,0 +1,277 @@
+---
+title-block-banner: true
+title: "Deep Dive into Linear Regression"
+date: 2024-10-14
+date-format: "YYYY-MM-D"
+author: 
+  - name: "Oselu Enabor"
+    orcid: 0000-0003-3813-2474
+    email: oenabor@gmail.com
+license: "CC BY"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    fig-responsive: true
+    fig-width: 8
+    fig-height: 6
+    code-fold: true
+execute: 
+  echo: true
+  warning: false
+editor: visual
+editor_options:
+  chunk_output_type: console
+---
+# Simple Linear Regression
+```{r}
+#| eval: false
+install.packages("metR")
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(metR)
+#library(plotly)
+```
+This notebook is a follow-along of the ISLR 2 textbook. 
+
+
+*Simple linear regression* is a simple approach to predicting a quantitative respnse `Y` using a single predictor variable `X`. The linearity between the two variables is the fundamental assumption of SLR. Mathematically,
+
+$$Y \approx \beta_{0} + \beta_{1}X$$
+
+The equation above can be read as the regressing of Y on X or (Y onto X). 
+
+**practical example**
+In a software distribution company, Y can represent sales of a product T, while X can rerpresent advertising spend through TV channel.
+
+$$sales \approx \beta_{0} + \beta_{1}\times TV_{advertisingspend}$$
+$\beta_{0} \; and \; \beta_{1}$ are unknown parameters and represent the intercept and slope terms in the linear model. They are the model's coefficient parameters. They are estimated by fitting the model with data. After estimating these parameters, the future sales of Product T can be predicted using TV advertising spend.
+
+$$\hat{y} = \hat{\beta_{0}} + \hat{\beta_{1}}X $$
+The $\hat{}$ symbol represents that this is an estimated value for an unknown parameter or coefficient. 
+
+The Advertising data set is used in this example - the data set consists of TV advertising budget and product sales in $n=200$ different markets. 
+
+**Goal**: obtain coefficient estimates of $\hat{\beta_{0}} \text{ and } \hat{\beta_{1}}$ such that our linear model fits the available data well - i.e. the values such that the resulting line is as closes as possible to the 200 data points. The minimizing least squares criterion will be used to measure closeness. 
+```{r}
+# read in the Advertising data set
+advertising <- read.csv("../data/Advertising.csv")
+
+head(advertising)
+
+```
+
+```{r}
+# attach Advertising to GlobalEnv
+attach(advertising)
+# fit a linear model
+model <- lm(sales ~TV)
+
+# create scatter plot sales vs tv
+plot(TV,sales, col="red", pch=20)
+# add regression line
+abline(model, col="blue", lwd=2)
+# add residuals as segments
+for (i in 1:nrow(advertising)){
+  segments(TV[i], sales[i], TV[i], fitted(model)[i], col="gray", lty=2)
+}
+```
+The plot above shows the following:
+
+1. Red dots represent the relationship between Sales and TV spend budget. From the plot, we see a positive correlation between the two variables. That is as the advertising spend increases so does the sales generated. 
+
+2. Blue line represents the least squares regression line that is closes to all the points on the graph. The model coefficient estimates are shown below.
+
+```{r}
+coefficients(model)
+```
+3. Grey lines represent the difference between the actual values of sales and the regression model's predicted value for each advertising spend. 
+
+**Plot contour**
+```{r}
+# create a grid of values for beta_0 and beta_1
+beta_0_seq <- seq(0.0, 0.1,length.out=10)
+beta_1_seq <- seq(5,10,length.out=10)
+# create grid
+coeff_grid <- expand.grid(x1=beta_0_seq, x2=beta_1_seq)
+# 
+#contour(coeff_grid)
+```
+## Assessing the Accuracy of the coefficient estimates
+
+Population Regression Line
+
+Remember a linear regression (if fact any model) is an estimator of the `true function` that captures the relationship between X and Y. In real data situations, the true relationship is usually not know, so the least squares line can be used to estimate the coefficient of the model.
+
+Think of it as the notion of samples and populations from statistics - we are using a sample estimate to characterize the relationship of the population. 
+
+This true relationship can be represented as 
+$$Y = f(X) + \epsilon$$
+$$Y = \beta_{0} + \beta_{1}X + \epsilon$$
+$\beta_{1}$ is the slope and intuitively - **average increase in Y associated with one-unit increase in X**. 
+
+$\epsilon$ represents the random error (mean=0) present
+
+The `standard error`, `SE`, is used to determine how accurate is a sample estimate of a population parameter. This statistic gives an indication of the average amount an estimate differs from the true value. 
+
+$$Var(\hat{\mu}) = SE(\hat{\mu})^2 = \frac{\sigma^2}{n}$$
+
+Where:
+$\sigma$ standard deviation of the predictions of Y.
+$\sigma^2 = Var(\epsilon)$ 
+
+
+The formula holds for independent observations and residuals have a common variance. From the equation above, the more observations we have,the smaller the standard error of estimate mean. 
+
+$$SE(\hat{\beta_0})^2 = \sigma^2[\frac{1}{n} + \frac{\bar{x}}{\Sigma_{i=1}^{n} (x_{i} - \bar{x})^2}]$$ 
+
+$$SE(\hat{\beta_1})^2 =  \frac{\sigma^2}{\Sigma_{i=1}^{n} (x_{i} - \bar{x})^2}$$
+
+Unfortunately, $\sigma^2$ is not known but can be estimated from available data.This estimate is known as the residual standard error, $RSE = \sqrt{RSS/(n-2)}$.
+
+
+SE can be used to calculate the confidence intervals and prediction intervals.
+
+A confidence interval is defined as the range of values which ill contain the true unknown value of the parameter. 
+
+An `x%` confidence interval means that the true value of this estimator will lie in this range with an `%` probability. This range is computed with the lower and upper limits computed from the sample data. 
+A 95% confidence interval:
+- if take repreated samples from data and construct confiddence interval for each sample, 95% of the intervals will contain the true unknown value of the parameter. 
+
+For *linear regression*, 95% confidence for $\beta_{1}$ is 
+$$\hat{\beta_1} \pm 2 \times SE(\hat{\beta_1}) $$
+This holds true for $\beta_{0}$.
+
+```{r}
+summary(model)
+```
+From the model summary information above, an increase of $1000 in TV advertising budget is **associated** with an increase of around 48 unit sales. 
+ 
+### Hypothesis test
+ 
+ Here we are testing the association of TV budget and unit sales. 
+ 
+ Null hypothesis $H_{0}$: **No relationship between sales and TV advertising budget**
+ $$H_{0}: \beta_{1} = 0$$
+ Alternative hypothesis $H_{a}$: **There is a relationship between X and Y**
+$$H_{a}: \beta_{1} \neq 0$$
+The hypothesis tests determines how far the sample estimate $\hat\beta_{1}$ is from zero, the further it is away, the more confident we are of the existence of a relationship between X and Y. **How far is far enough?** - This depends on the accuracy of $\hat{\beta_{1}}$, i.e. - the standard error (SE$\hat{\beta_{1}}$) - if small, then relatively small values of $\hat{\beta_{1}} $**may provide** strong evidence that $\beta_{1} \neq 0$. **However**, if SE($\hat{\beta_{1}}$) is large, then $\hat{\beta_{1}}$ must be large in absolute value in order to reject the null hypothesis. In practice, the t-statistic is calculated. To do this, we calculate a *t-statistic*
+$$t = \frac{\hat{\beta_1}-0}{SE(\hat{\beta_1})}$$
+Once *t-statistic* is calculated, use the p-value to determine if the t-statistic is valid or due to random chance. 
+
+**A small p-value indicates the unlikelihood of observing a substantial association ($\beta_{1}$) between the predictor and response due to chance, in the absence of any real association between the predictor and the response. or mathematically**
+$$P(t | \beta_{1})=0
+$$
+```{r}
+# calculate RSS
+calc_RSS <- function(beta0,beta1, data){
+  # get predicted sales based on TV advertising
+  predicted_sales <- beta0 + beta1 *data$TV
+  # calculate RSS
+  rss <-  sum((data$sales - predicted_sales)^2)
+  return (rss)
+}
+```
+```{r}
+# create a grid of beta9 and beta1
+beta0_seq <- seq(-10,10, length.out  =100)
+beta1_seq <- seq(-0.1,0.1, length.out = 100)
+```
+```{r}
+# create RSS matrix grid
+rss_matrix <- outer(beta0_seq, beta1_seq, Vectorize(function(b0,b1) calc_RSS(b0,b1,advertising)))
+```
+```{r}
+# convert to data frame
+rss_df <- expand.grid(Beta0=beta0_seq, Beta1=beta1_seq)
+rss_df$RSS <- as.vector(rss_matrix)
+```
+
+```{r}
+ggplot(rss_df, aes(x=Beta0, y=Beta1)) +
+  geom_contour(aes(z=rss_df$RSS), color="blue") +
+  geom_text_contour(aes(z=RSS), color="red", size=3)
+```
+```{r}
+#rss <- outer(beta0_seq, beta1_seq, function(b0, b1) calc_RSS(b0, b1, advertising))
+```
+
+
+## Assessing the model's accuracy
+
+Quality of a linear regression fit is assessed with two related quantities 
+- *residual standard error* (RSE)
+-$R^2$
+
+### Residual Standard Error (RSE)
+The RSE is an estimate of the standard deviation of $\epsilon$ - the average amount that the response will deviate from the **true regression line**. 
+$$RSE = \sqrt{\frac{1}{n-2}*RSS} = \sqrt{\frac{1}{n-2}* \Sigma^{n}_{i=1}(y_{i} - \hat{y_{i}})^2}$$
+
+RSE is considered the measure of *lack of fit* of the model to the data. If the model's prediction are close the the true outcome values - then RSE will be small and can conclude model fits data well - and **vice versa**.
+
+### $R^2$
+$R^2$ is a measurement of proportion between 0 and 1 - and it is independent of the scale of Y.
+$$R^{2} = \frac{TSS - RSS}{TSS} = 1 - \frac{RSS}{TSS}$$
+**TSS** measures the **total variance** in the response **Y** - inherent variability in the response variable before regression is performed. 
+
+**RSS** measures the amount of variability that is left unexplained after performing the regression. 
+
+**R^2** measures the *proportion of variability* in Y that can be explained using X.
+
+
+# Multiple Linear Regression
+Multiple Linear Regression is more often used than simple linear as in practice we have more than one predictor. For example in the **Advertising** data, we examined only the relationship between *sales* and *TV advertising*. However, we have *radio spend* and *newspaper spend* available. Are any of the two associated with sales? 
+
+Three simple linear regression models could be created - with each advertising medium used as a predictor. 
+
+Sales and Radio Advertising
+
+```{r}
+# fit a linear model
+attach(advertising)
+model_radio <- lm(sales ~radio)
+
+# create scatter plot sales vs tv
+plot(radio,sales, col="red", pch=20)
+# add regression line
+abline(model_radio, col="blue", lwd=2)
+# add residuals as segments
+for (i in 1:nrow(advertising)){
+  segments(radio[i], sales[i], radio[i], fitted(model_radio)[i], col="gray", lty=2)
+}
+```
+```{r}
+summary(model_radio)
+
+```
+Sales and Newspaper advertising
+
+```{r}
+# fit a linear model
+attach(advertising)
+model_news <- lm(sales ~newspaper)
+
+# create scatter plot sales vs tv
+plot(newspaper,sales, col="red", pch=20)
+# add regression line
+abline(model_news, col="blue", lwd=2)
+# add residuals as segments
+for (i in 1:nrow(advertising)){
+  segments(newspaper[i], sales[i], newspaper[i], fitted(model_news)[i], col="gray", lty=2)
+}
+```
+```{r}
+summary(model_news)
+```
+Rather than fitting a separate simple linear regression model for each predictor - we can extend the model and have a coefficient for each predictor. For *p* distinct predictors, the simple linear regression model would look like
+$$Y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + ... + \beta_{p}X_{p} + \epsilon$$
+where:
+$X_j$ represents the jth variable
+
+$\beta_{j}$ represents the association between variable *j* and the response Y. This is interpreted as the *average* effect on Y of a one unit increase in $X_j$, holding all other predictors fixed.  
+
+The advertising problem would then look like 
+$$sales = \beta_{0} + \beta_{1} \times TV + \beta_{2} \times radio + \beta_{3} \times newspaper + \epsilon$$
