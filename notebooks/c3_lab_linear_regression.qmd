@@ -30,6 +30,8 @@ install.packages("metR")
 ```
 
 ```{r}
+library(ISLR)
+library(ISLR2)
 library(ggplot2)
 library(dplyr)
 library(metR)
@@ -269,9 +271,129 @@ summary(model_news)
 Rather than fitting a separate simple linear regression model for each predictor - we can extend the model and have a coefficient for each predictor. For *p* distinct predictors, the simple linear regression model would look like
 $$Y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + ... + \beta_{p}X_{p} + \epsilon$$
 where:
-$X_j$ represents the jth variable
+$X_j$ represents the $j_{th}$ variable
 
 $\beta_{j}$ represents the association between variable *j* and the response Y. This is interpreted as the *average* effect on Y of a one unit increase in $X_j$, holding all other predictors fixed.  
 
 The advertising problem would then look like 
 $$sales = \beta_{0} + \beta_{1} \times TV + \beta_{2} \times radio + \beta_{3} \times newspaper + \epsilon$$
+
+## Estimating Regression Coefficients
+Predictions can made if the coefficients for each independent variable is known.
+$$\hat{y} = \hat{\beta_{0}} + \hat{\beta_{1}X_{1}} + \hat{\beta_{2}X_{2}} + ... + \hat{\beta_{p}X_{p}}$$.
+
+**How do we get these parameter estimates?**
+
+The parameters are estimated using *least squares approach* just like in the simple linear regression. The goal is to obtain the set of parameters $\beta_0, \beta_1,..,\beta_p$ that minimize the sum of squared residuals. 
+$$RSS = \Sigma_{i=1}^{n} (y_{i} - \hat{y_{i}})^2$$
+
+**Example - multiple linear regression - Advertising data**
+
+**Scenario 1 - predict sales using radio
+
+The following code will create a MLR model on the *Advertising* data set with TV, radio, and newspaper advertising budgets used as predictors to predict product sales. 
+
+```{r}
+# fit a linear model
+#attach(advertising)
+model_mlr <- lm(sales ~newspaper+TV+radio, data=advertising)
+# show summary of model
+summary(model_mlr)
+```
+
+From the results above, if we were to spend an additional `$10,000.00` on:
+- radio advertising budget - while keeping `TV` and `newspaper` spend constant, this would result in `1885` units of additional sales. The `newspaper` variable's regression coefficient estimate was non-zero and significant in the single linear regression model above however now it is negative and not significant. **what does this mean?**
+
+This highlights the difference between SLR and MLR - in SLR the *newspaper's regression coefficient* represents **the average change in product sales** associated with a **$Y  change in newspaper advertising budget** ignoring all other predictors.
+
+Whereas in the MLR case, the *newspaper's regression coefficient* represents **the average change in product sales associated with a change in newspaper budget** while keeping other variables **FIXED**
+
+Does it make sense that SLR says one thing and MLR says another? This is where **colinearity** comes into play.
+
+```{r}
+# calculate the correlation matrix with R using the pearson 0method
+corr_matrix <- cor(advertising[,c("TV","radio","newspaper","sales")], method="pearson")
+# do not show mirrored results
+corr_matrix[lower.tri(corr_matrix)] <- NA
+print(corr_matrix)
+```
+The correlation matrix above shows that radio and newspaper have a correlation of 0.35 - indicating that more or less markets with high newspaper advertising also tend to have high radio advertising. The MLR model says newspaper is not associated with sales but radio is associated with sales. Assuming the MLR model is correct then markets with more spend on radio will show an increase in sales and as the correlation matrix show, these markets also tend to spend more on advertising. This is where **confounding** comes into play - in the SLR model, when we see influence of newspaper on sales - we are ignoring radio but actually radio is the *causal factor*. Those that spend on **radio** also spend on newspaper. 
+
+## Important Considerations for Multiple Linear Regression
+The following section discusses important considerations when performing multiple linear regression. 
+
+### Is there a relationship between response and predictors?
+In MLR we need to check whether $\beta_{1}, \beta_{2}, ..., \beta_{p} = 0$, just like SLR, a **hypothesis test** is used to answer this question.
+
+**null hypothesis**: 
+$$H_{0}:\beta_{1}, \beta_{2}, ..., \beta_{p} = 0 $$
+**alternative hypothesis**
+$$H_{a}: \text{at least one } \beta_{j} \text{ is non-zero}.$$
+*This* hypothesis test is performed by calculating the F-Statistic (*why??**)
+$$F = \frac{(TSS-RSS)/p}{RSS/(n-p-1)}$$
+
+If the **linear model assumptions** are correct, it is possible to show:
+$$E\{(RSS/(n-p-1)\} = \sigma^2$$
+and provided that $H_0$ is true
+$$E\{(TSS-RSS)/p\} = \sigma^2$$
+
+Hence when there is **NO** relationship between *response (Y)* and *predictors*, F-statistic is expected to be close to 1 and if $H_a$ is true, then F is to be greater than 1.However, *how large does the F-statistic need to be before we can reject $H_0$ and conclude there is a relationship?* This depends on the size of data set (n) and number of predictors (p).
+
+When n is large, an F-statistic that is just above one can still provide evidence of a relationship between the response and variables. In contrast, a larger F-statistic is required to reject null hypothesis when the number of data set observations is small.
+
+### Feature Selection - deciding on important variables
+Typically, the response is usually associated with a subset of the predictors - variable selection is the task of determining which predictors are associated with the response in order to fit a model with only those predictors. There are three classical approaches for this task:
+1. Forward selection
+2. Backward selection
+3. Mixed selection
+
+### Model Fit
+**$R^2$** and **RSE** are the two most common numerical measures for model fit and they are computed the same way as in SLR.$R^2$ is the *square of the correlation* between the **response** and the **variable**. In MLR, $R^2$ is equal to $Cor(Y,\hat{Y})^2$, the *square of the correlation* between **response** and **fitted linear model**. Note that $R^2$ will **always increase** when more variables are added to the models *even if those variable have a weak association with the response.* **why?** - more variables will result in a decrease in the `RSS` on the training data.
+
+### Predictions
+
+There are 3 types of uncertainty associated with MLR predictions. 
+1. Inaccuracy of the parameters - coefficient estimates is related to the reducible error.
+2. Model bias - assuming a linear model for $f(X)$ is an approximation of reality - also reducible error.
+3. Irreducible error - randomness in the population. Prediction intervals are used to determine the variance between $Y$ and $\hat{Y}$. 
+
+## Other considerations in Regression Model
+### Qualitative predictors
+Quantitative data has been used so far for regression models, however in practice often predictors are also qualitative. 
+```{r}
+# assign Credit to a variable -  credit
+credit <- Credit
+# show first 6 observations 
+head(credit)
+```
+```{r}
+# create a pairwise plot
+pairs(credit)
+```
+#### Predictors with only 2 levels
+Using the `credit` data set, let us investigate the difference sin credit card balance between those who own a house and those who do not. Ownership is a *factor* or *qualitative predictor* with only two *levels* and using this just requires creating a *numerical* variable with only two possible values. This is known as **one-hot encoding** in machine learning.
+
+$$
+x_{i} = 
+\begin{cases} 
+1 & \text{if } i_{th} \text{ person owns a house.}\\ 
+0 & \text{if } i_{th} \text{ person does not own a house} 
+\end{cases}
+$$
+
+Using the above definition, the regression model equation takes on the form
+
+$$
+x_{i} = \beta_{0} + \beta_{1}x_{i}+ \epsilon_{i}
+\begin{cases} 
+\beta_{0} + \beta_{1}x_{i}+ \epsilon_{i} & \text{if } i_{th} \text{ person owns a house.}\\ 
+\beta_{0} + \epsilon_{i} & \text{if } i_{th} \text{ person does not own a house} 
+\end{cases}
+$$
+
+```{r}
+model_house <- lm(Balance ~Own, data=credit)
+# show summary of model
+summary(model_house)
+```
+Notice the high *p-value* for the dummy variable, this suggests that there is no statistical evidence of a difference in average credit card balance based on house ownership.

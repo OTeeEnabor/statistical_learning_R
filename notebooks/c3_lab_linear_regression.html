@@ -123,7 +123,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#r2" id="toc-r2" class="nav-link" data-scroll-target="#r2"><span class="header-section-number">1.2.2</span> <span class="math inline">\(R^2\)</span></a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#multiple-linear-regression" id="toc-multiple-linear-regression" class="nav-link" data-scroll-target="#multiple-linear-regression"><span class="header-section-number">2</span> Multiple Linear Regression</a></li>
+  <li><a href="#multiple-linear-regression" id="toc-multiple-linear-regression" class="nav-link" data-scroll-target="#multiple-linear-regression"><span class="header-section-number">2</span> Multiple Linear Regression</a>
+  <ul class="collapse">
+  <li><a href="#estimating-regression-coefficients" id="toc-estimating-regression-coefficients" class="nav-link" data-scroll-target="#estimating-regression-coefficients"><span class="header-section-number">2.1</span> Estimating Regression Coefficients</a></li>
+  <li><a href="#important-considerations-for-multiple-linear-regression" id="toc-important-considerations-for-multiple-linear-regression" class="nav-link" data-scroll-target="#important-considerations-for-multiple-linear-regression"><span class="header-section-number">2.2</span> Important Considerations for Multiple Linear Regression</a>
+  <ul class="collapse">
+  <li><a href="#is-there-a-relationship-between-response-and-predictors" id="toc-is-there-a-relationship-between-response-and-predictors" class="nav-link" data-scroll-target="#is-there-a-relationship-between-response-and-predictors"><span class="header-section-number">2.2.1</span> Is there a relationship between response and predictors?</a></li>
+  <li><a href="#feature-selection---deciding-on-important-variables" id="toc-feature-selection---deciding-on-important-variables" class="nav-link" data-scroll-target="#feature-selection---deciding-on-important-variables"><span class="header-section-number">2.2.2</span> Feature Selection - deciding on important variables</a></li>
+  <li><a href="#model-fit" id="toc-model-fit" class="nav-link" data-scroll-target="#model-fit"><span class="header-section-number">2.2.3</span> Model Fit</a></li>
+  <li><a href="#predictions" id="toc-predictions" class="nav-link" data-scroll-target="#predictions"><span class="header-section-number">2.2.4</span> Predictions</a></li>
+  </ul></li>
+  <li><a href="#other-considerations-in-regression-model" id="toc-other-considerations-in-regression-model" class="nav-link" data-scroll-target="#other-considerations-in-regression-model"><span class="header-section-number">2.3</span> Other considerations in Regression Model</a>
+  <ul class="collapse">
+  <li><a href="#qualitative-predictors" id="toc-qualitative-predictors" class="nav-link" data-scroll-target="#qualitative-predictors"><span class="header-section-number">2.3.1</span> Qualitative predictors</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -143,10 +157,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(metR)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#library(plotly)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ISLR)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ISLR2)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(metR)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#library(plotly)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>This notebook is a follow-along of the ISLR 2 textbook.</p>
@@ -154,8 +170,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><span class="math display">\[Y \approx \beta_{0} + \beta_{1}X\]</span></p>
 <p>The equation above can be read as the regressing of Y on X or (Y onto X).</p>
 <p><strong>practical example</strong> In a software distribution company, Y can represent sales of a product T, while X can rerpresent advertising spend through TV channel.</p>
-<p><span class="math display">\[sales \approx \beta_{0} + \beta_{1} TV_{advertising_spend}\]</span> <span class="math inline">\(\beta_{0} \; and \; \beta_{1}\)</span> are unknown parameters and rerpresent the intercept and slope terms in the linear model. They are the model’s coefficient parameters. They are estimated by fitting the model with data. After estimating these parameters, the future sales of Product T can be predicted using TV advertising spend.</p>
+<p><span class="math display">\[sales \approx \beta_{0} + \beta_{1}\times TV_{advertisingspend}\]</span> <span class="math inline">\(\beta_{0} \; and \; \beta_{1}\)</span> are unknown parameters and represent the intercept and slope terms in the linear model. They are the model’s coefficient parameters. They are estimated by fitting the model with data. After estimating these parameters, the future sales of Product T can be predicted using TV advertising spend.</p>
 <p><span class="math display">\[\hat{y} = \hat{\beta_{0}} + \hat{\beta_{1}}X \]</span> The <span class="math inline">\(\hat{}\)</span> symbol represents that this is an estimated value for an unknown parameter or coefficient.</p>
+<p>The Advertising data set is used in this example - the data set consists of TV advertising budget and product sales in <span class="math inline">\(n=200\)</span> different markets.</p>
+<p><strong>Goal</strong>: obtain coefficient estimates of <span class="math inline">\(\hat{\beta_{0}} \text{ and } \hat{\beta_{1}}\)</span> such that our linear model fits the available data well - i.e.&nbsp;the values such that the resulting line is as closes as possible to the 200 data points. The minimizing least squares criterion will be used to measure closeness.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -195,9 +213,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="c3_lab_linear_regression_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="768"></p>
 </div>
 </div>
-<p>The plot above shows the following: 1. Red dots represent the relationship between Sales and TV spend budget. From the plot, we see a positive correlation between the two variables. That is as the advertising spend increases so does the sales generated.</p>
-<ol start="2" type="1">
-<li>Blue line represents the least squares regression line that is closes to all the points on the graph. The model coefficient estimates are shown below.</li>
+<p>The plot above shows the following:</p>
+<ol type="1">
+<li><p>Red dots represent the relationship between Sales and TV spend budget. From the plot, we see a positive correlation between the two variables. That is as the advertising spend increases so does the sales generated.</p></li>
+<li><p>Blue line represents the least squares regression line that is closes to all the points on the graph. The model coefficient estimates are shown below.</p></li>
 </ol>
 <div class="cell">
 <details>
@@ -349,6 +368,275 @@ F-statistic: 312.1 on 1 and 198 DF,  p-value: &lt; 2.2e-16</code></pre>
 </section>
 <section id="multiple-linear-regression" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Multiple Linear Regression</h1>
+<p>Multiple Linear Regression is more often used than simple linear as in practice we have more than one predictor. For example in the <strong>Advertising</strong> data, we examined only the relationship between <em>sales</em> and <em>TV advertising</em>. However, we have <em>radio spend</em> and <em>newspaper spend</em> available. Are any of the two associated with sales?</p>
+<p>Three simple linear regression models could be created - with each advertising medium used as a predictor.</p>
+<p>Sales and Radio Advertising</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fit a linear model</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attach</span>(advertising)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>model_radio <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span>radio)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># create scatter plot sales vs tv</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(radio,sales, <span class="at">col=</span><span class="st">"red"</span>, <span class="at">pch=</span><span class="dv">20</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># add regression line</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(model_radio, <span class="at">col=</span><span class="st">"blue"</span>, <span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># add residuals as segments</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(advertising)){</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(radio[i], sales[i], radio[i], <span class="fu">fitted</span>(model_radio)[i], <span class="at">col=</span><span class="st">"gray"</span>, <span class="at">lty=</span><span class="dv">2</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="c3_lab_linear_regression_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_radio)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = sales ~ radio)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-15.7305  -2.1324   0.7707   2.7775   8.1810 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  9.31164    0.56290  16.542   &lt;2e-16 ***
+radio        0.20250    0.02041   9.921   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 4.275 on 198 degrees of freedom
+Multiple R-squared:  0.332, Adjusted R-squared:  0.3287 
+F-statistic: 98.42 on 1 and 198 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Sales and Newspaper advertising</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fit a linear model</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">attach</span>(advertising)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>model_news <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span>newspaper)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># create scatter plot sales vs tv</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(newspaper,sales, <span class="at">col=</span><span class="st">"red"</span>, <span class="at">pch=</span><span class="dv">20</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># add regression line</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(model_news, <span class="at">col=</span><span class="st">"blue"</span>, <span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># add residuals as segments</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(advertising)){</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(newspaper[i], sales[i], newspaper[i], <span class="fu">fitted</span>(model_news)[i], <span class="at">col=</span><span class="st">"gray"</span>, <span class="at">lty=</span><span class="dv">2</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="c3_lab_linear_regression_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_news)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = sales ~ newspaper)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-11.2272  -3.3873  -0.8392   3.5059  12.7751 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 12.35141    0.62142   19.88  &lt; 2e-16 ***
+newspaper    0.05469    0.01658    3.30  0.00115 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 5.092 on 198 degrees of freedom
+Multiple R-squared:  0.05212,   Adjusted R-squared:  0.04733 
+F-statistic: 10.89 on 1 and 198 DF,  p-value: 0.001148</code></pre>
+</div>
+</div>
+<p>Rather than fitting a separate simple linear regression model for each predictor - we can extend the model and have a coefficient for each predictor. For <em>p</em> distinct predictors, the simple linear regression model would look like <span class="math display">\[Y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + ... + \beta_{p}X_{p} + \epsilon\]</span> where: <span class="math inline">\(X_j\)</span> represents the <span class="math inline">\(j_{th}\)</span> variable</p>
+<p><span class="math inline">\(\beta_{j}\)</span> represents the association between variable <em>j</em> and the response Y. This is interpreted as the <em>average</em> effect on Y of a one unit increase in <span class="math inline">\(X_j\)</span>, holding all other predictors fixed.</p>
+<p>The advertising problem would then look like <span class="math display">\[sales = \beta_{0} + \beta_{1} \times TV + \beta_{2} \times radio + \beta_{3} \times newspaper + \epsilon\]</span></p>
+<section id="estimating-regression-coefficients" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="estimating-regression-coefficients"><span class="header-section-number">2.1</span> Estimating Regression Coefficients</h2>
+<p>Predictions can made if the coefficients for each independent variable is known. <span class="math display">\[\hat{y} = \hat{\beta_{0}} + \hat{\beta_{1}X_{1}} + \hat{\beta_{2}X_{2}} + ... + \hat{\beta_{p}X_{p}}\]</span>.</p>
+<p><strong>How do we get these parameter estimates?</strong></p>
+<p>The parameters are estimated using <em>least squares approach</em> just like in the simple linear regression. The goal is to obtain the set of parameters <span class="math inline">\(\beta_0, \beta_1,..,\beta_p\)</span> that minimize the sum of squared residuals. <span class="math display">\[RSS = \Sigma_{i=1}^{n} (y_{i} - \hat{y_{i}})^2\]</span></p>
+<p><strong>Example - multiple linear regression - Advertising data</strong></p>
+<p>**Scenario 1 - predict sales using radio</p>
+<p>The following code will create a MLR model on the <em>Advertising</em> data set with TV, radio, and newspaper advertising budgets used as predictors to predict product sales.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fit a linear model</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co">#attach(advertising)</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>model_mlr <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span>newspaper<span class="sc">+</span>TV<span class="sc">+</span>radio, <span class="at">data=</span>advertising)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># show summary of model</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_mlr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = sales ~ newspaper + TV + radio, data = advertising)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-8.8277 -0.8908  0.2418  1.1893  2.8292 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  2.938889   0.311908   9.422   &lt;2e-16 ***
+newspaper   -0.001037   0.005871  -0.177     0.86    
+TV           0.045765   0.001395  32.809   &lt;2e-16 ***
+radio        0.188530   0.008611  21.893   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.686 on 196 degrees of freedom
+Multiple R-squared:  0.8972,    Adjusted R-squared:  0.8956 
+F-statistic: 570.3 on 3 and 196 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>From the results above, if we were to spend an additional <code>$10,000.00</code> on: - radio advertising budget - while keeping <code>TV</code> and <code>newspaper</code> spend constant, this would result in <code>1885</code> units of additional sales. The <code>newspaper</code> variable’s regression coefficient estimate was non-zero and significant in the single linear regression model above however now it is negative and not significant. <strong>what does this mean?</strong></p>
+<p>This highlights the difference between SLR and MLR - in SLR the <em>newspaper’s regression coefficient</em> represents <strong>the average change in product sales</strong> associated with a <strong>$Y change in newspaper advertising budget</strong> ignoring all other predictors.</p>
+<p>Whereas in the MLR case, the <em>newspaper’s regression coefficient</em> represents <strong>the average change in product sales associated with a change in newspaper budget</strong> while keeping other variables <strong>FIXED</strong></p>
+<p>Does it make sense that SLR says one thing and MLR says another? This is where <strong>colinearity</strong> comes into play.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate the correlation matrix with R using the pearson 0method</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>corr_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(advertising[,<span class="fu">c</span>(<span class="st">"TV"</span>,<span class="st">"radio"</span>,<span class="st">"newspaper"</span>,<span class="st">"sales"</span>)], <span class="at">method=</span><span class="st">"pearson"</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># do not show mirrored results</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>corr_matrix[<span class="fu">lower.tri</span>(corr_matrix)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(corr_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>          TV      radio  newspaper     sales
+TV         1 0.05480866 0.05664787 0.7822244
+radio     NA 1.00000000 0.35410375 0.5762226
+newspaper NA         NA 1.00000000 0.2282990
+sales     NA         NA         NA 1.0000000</code></pre>
+</div>
+</div>
+<p>The correlation matrix above shows that radio and newspaper have a correlation of 0.35 - indicating that more or less markets with high newspaper advertising also tend to have high radio advertising. The MLR model says newspaper is not associated with sales but radio is associated with sales. Assuming the MLR model is correct then markets with more spend on radio will show an increase in sales and as the correlation matrix show, these markets also tend to spend more on advertising. This is where <strong>confounding</strong> comes into play - in the SLR model, when we see influence of newspaper on sales - we are ignoring radio but actually radio is the <em>causal factor</em>. Those that spend on <strong>radio</strong> also spend on newspaper.</p>
+</section>
+<section id="important-considerations-for-multiple-linear-regression" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="important-considerations-for-multiple-linear-regression"><span class="header-section-number">2.2</span> Important Considerations for Multiple Linear Regression</h2>
+<p>The following section discusses important considerations when performing multiple linear regression.</p>
+<section id="is-there-a-relationship-between-response-and-predictors" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="is-there-a-relationship-between-response-and-predictors"><span class="header-section-number">2.2.1</span> Is there a relationship between response and predictors?</h3>
+<p>In MLR we need to check whether <span class="math inline">\(\beta_{1}, \beta_{2}, ..., \beta_{p} = 0\)</span>, just like SLR, a <strong>hypothesis test</strong> is used to answer this question.</p>
+<p><strong>null hypothesis</strong>: <span class="math display">\[H_{0}:\beta_{1}, \beta_{2}, ..., \beta_{p} = 0 \]</span> <strong>alternative hypothesis</strong> <span class="math display">\[H_{a}: \text{at least one } \beta_{j} \text{ is non-zero}.\]</span> <em>This</em> hypothesis test is performed by calculating the F-Statistic (*why??**) <span class="math display">\[F = \frac{(TSS-RSS)/p}{RSS/(n-p-1)}\]</span></p>
+<p>If the <strong>linear model assumptions</strong> are correct, it is possible to show: <span class="math display">\[E\{(RSS/(n-p-1)\} = \sigma^2\]</span> and provided that <span class="math inline">\(H_0\)</span> is true <span class="math display">\[E\{(TSS-RSS)/p\} = \sigma^2\]</span></p>
+<p>Hence when there is <strong>NO</strong> relationship between <em>response (Y)</em> and <em>predictors</em>, F-statistic is expected to be close to 1 and if <span class="math inline">\(H_a\)</span> is true, then F is to be greater than 1.However, <em>how large does the F-statistic need to be before we can reject <span class="math inline">\(H_0\)</span> and conclude there is a relationship?</em> This depends on the size of data set (n) and number of predictors (p).</p>
+<p>When n is large, an F-statistic that is just above one can still provide evidence of a relationship between the response and variables. In contrast, a larger F-statistic is required to reject null hypothesis when the number of data set observations is small.</p>
+</section>
+<section id="feature-selection---deciding-on-important-variables" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="feature-selection---deciding-on-important-variables"><span class="header-section-number">2.2.2</span> Feature Selection - deciding on important variables</h3>
+<p>Typically, the response is usually associated with a subset of the predictors - variable selection is the task of determining which predictors are associated with the response in order to fit a model with only those predictors. There are three classical approaches for this task: 1. Forward selection 2. Backward selection 3. Mixed selection</p>
+</section>
+<section id="model-fit" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="model-fit"><span class="header-section-number">2.2.3</span> Model Fit</h3>
+<p><strong><span class="math inline">\(R^2\)</span></strong> and <strong>RSE</strong> are the two most common numerical measures for model fit and they are computed the same way as in SLR.<span class="math inline">\(R^2\)</span> is the <em>square of the correlation</em> between the <strong>response</strong> and the <strong>variable</strong>. In MLR, <span class="math inline">\(R^2\)</span> is equal to <span class="math inline">\(Cor(Y,\hat{Y})^2\)</span>, the <em>square of the correlation</em> between <strong>response</strong> and <strong>fitted linear model</strong>. Note that <span class="math inline">\(R^2\)</span> will <strong>always increase</strong> when more variables are added to the models <em>even if those variable have a weak association with the response.</em> <strong>why?</strong> - more variables will result in a decrease in the <code>RSS</code> on the training data.</p>
+</section>
+<section id="predictions" class="level3" data-number="2.2.4">
+<h3 data-number="2.2.4" class="anchored" data-anchor-id="predictions"><span class="header-section-number">2.2.4</span> Predictions</h3>
+<p>There are 3 types of uncertainty associated with MLR predictions. 1. Inaccuracy of the parameters - coefficient estimates is related to the reducible error. 2. Model bias - assuming a linear model for <span class="math inline">\(f(X)\)</span> is an approximation of reality - also reducible error. 3. Irreducible error - randomness in the population. Prediction intervals are used to determine the variance between <span class="math inline">\(Y\)</span> and <span class="math inline">\(\hat{Y}\)</span>.</p>
+</section>
+</section>
+<section id="other-considerations-in-regression-model" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="other-considerations-in-regression-model"><span class="header-section-number">2.3</span> Other considerations in Regression Model</h2>
+<section id="qualitative-predictors" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="qualitative-predictors"><span class="header-section-number">2.3.1</span> Qualitative predictors</h3>
+<p>Quantitative data has been used so far for regression models, however in practice often predictors are also qualitative.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assign Credit to a variable -  credit</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>credit <span class="ot">&lt;-</span> Credit</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co"># show first 6 observations </span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(credit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Income Limit Rating Cards Age Education Own Student Married Region Balance
+1  14.891  3606    283     2  34        11  No      No     Yes  South     333
+2 106.025  6645    483     3  82        15 Yes     Yes     Yes   West     903
+3 104.593  7075    514     4  71        11  No      No      No   West     580
+4 148.924  9504    681     3  36        11 Yes      No      No   West     964
+5  55.882  4897    357     2  68        16  No      No     Yes  South     331
+6  80.180  8047    569     4  77        10  No      No      No  South    1151</code></pre>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a pairwise plot</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pairs</span>(credit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="c3_lab_linear_regression_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<section id="predictors-with-only-2-levels" class="level4" data-number="2.3.1.1">
+<h4 data-number="2.3.1.1" class="anchored" data-anchor-id="predictors-with-only-2-levels"><span class="header-section-number">2.3.1.1</span> Predictors with only 2 levels</h4>
+<p>Using the <code>credit</code> data set, let us investigate the difference sin credit card balance between those who own a house and those who do not. Ownership is a <em>factor</em> or <em>qualitative predictor</em> with only two <em>levels</em> and using this just requires creating a <em>numerical</em> variable with only two possible values. This is known as <strong>one-hot encoding</strong> in machine learning.</p>
+<p><span class="math display">\[
+x_{i} =
+\begin{cases}
+1 &amp; \text{if } i_{th} \text{ person owns a house.}\\
+0 &amp; \text{if } i_{th} \text{ person does not own a house}
+\end{cases}
+\]</span></p>
+<p>Using the above definition, the regression model equation takes on the form</p>
+<p><span class="math display">\[
+x_{i} = \beta_{0} + \beta_{1}x_{i}+ \epsilon_{i}
+\begin{cases}
+\beta_{0} + \beta_{1}x_{i}+ \epsilon_{i} &amp; \text{if } i_{th} \text{ person owns a house.}\\
+\beta_{0} + \epsilon_{i} &amp; \text{if } i_{th} \text{ person does not own a house}
+\end{cases}
+\]</span></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>model_house <span class="ot">&lt;-</span> <span class="fu">lm</span>(Balance <span class="sc">~</span>Own, <span class="at">data=</span>credit)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># show summary of model</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_house)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Balance ~ Own, data = credit)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-529.54 -455.35  -60.17  334.71 1489.20 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   509.80      33.13  15.389   &lt;2e-16 ***
+OwnYes         19.73      46.05   0.429    0.669    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 460.2 on 398 degrees of freedom
+Multiple R-squared:  0.0004611, Adjusted R-squared:  -0.00205 
+F-statistic: 0.1836 on 1 and 398 DF,  p-value: 0.6685</code></pre>
+</div>
+</div>
+<p>Notice the high <em>p-value</em> for the dummy variable, this suggests that there is no statistical evidence of a difference in average credit card balance based on house ownership.</p>
+</section>
+</section>
+</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div id="quarto-reuse" class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</a></div></div></section></div></main>
