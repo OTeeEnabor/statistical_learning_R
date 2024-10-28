@@ -136,6 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#other-considerations-in-regression-model" id="toc-other-considerations-in-regression-model" class="nav-link" data-scroll-target="#other-considerations-in-regression-model"><span class="header-section-number">2.3</span> Other considerations in Regression Model</a>
   <ul class="collapse">
   <li><a href="#qualitative-predictors" id="toc-qualitative-predictors" class="nav-link" data-scroll-target="#qualitative-predictors"><span class="header-section-number">2.3.1</span> Qualitative predictors</a></li>
+  <li><a href="#extensions-of-linear-model" id="toc-extensions-of-linear-model" class="nav-link" data-scroll-target="#extensions-of-linear-model"><span class="header-section-number">2.3.2</span> Extensions of Linear Model</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -635,6 +636,58 @@ F-statistic: 0.1836 on 1 and 398 DF,  p-value: 0.6685</code></pre>
 </div>
 <p>Notice the high <em>p-value</em> for the dummy variable, this suggests that there is no statistical evidence of a difference in average credit card balance based on house ownership.</p>
 </section>
+</section>
+<section id="extensions-of-linear-model" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="extensions-of-linear-model"><span class="header-section-number">2.3.2</span> Extensions of Linear Model</h3>
+<p>The linear regression model makes several highly restrictive assumptions that are violated <strong>in practice</strong>. The 2 most important assumptions state that the relationship between predictors and response are <strong>additive and linear.</strong></p>
+<ol type="1">
+<li><p>The <strong>additive</strong> assumption means that associations between a predictor <span class="math inline">\(X_j\)</span> and the response <span class="math inline">\(Y\)</span> <strong>does not depend on the values of other predictors.</strong> - confounding variables.</p></li>
+<li><p>The <strong>linearity</strong> assumption states that a <span class="math inline">\(\delta\)</span> in <span class="math inline">\(Y\)</span> associated with a <strong>one-unit change</strong> in <span class="math inline">\(X_j\)</span> is constant, regardless of the value of <span class="math inline">\(X_j\)</span>.</p></li>
+</ol>
+<p>However, in practice the <em>additive</em> assumption is violated by the occurrence of a <em>synergy effect</em> or <em>interaction effect</em> - which occur where a change in one of the predictors influences another predictor. For example in the <em>Advertising</em> data set, an increase in budget for radio advertising increases the effectiveness of TV advertising - therefore as the slope term <span class="math inline">\(\beta_{TV}\)</span> should have a positive correlation with <span class="math inline">\(\beta_{radio}\)</span>.</p>
+<p>Considering the standard linear regression model with two variables: <span class="math display">\[Y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \epsilon\]</span> a <strong>one-unit increase</strong> in <span class="math inline">\(X_{1}\)</span> is associated with an <strong>average increase in Y</strong> of <span class="math inline">\(\beta_{1}\)</span> units. This model is extended when including the <em>interaction effect</em> - product of <span class="math inline">\(X_{1}\)</span> and <span class="math inline">\(X_{2}\)</span>. The extended model is then: <span class="math display">\[Y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \beta_{3}X_{1}X_{2} + \epsilon \\
+Y = \beta_{0} + (\beta_{1} + \beta_{3}X_{2})X_{1} + \beta_{2}X_{2}  + \epsilon\]</span></p>
+<p>** Interaction effect with advertising data**</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fit a linear model</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co">#attach(advertising)</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co"># fit model with interaction effect</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>model_mlr_int <span class="ot">&lt;-</span> <span class="fu">lm</span>(sales <span class="sc">~</span> TV<span class="sc">+</span>radio <span class="sc">+</span>(TV<span class="sc">*</span>radio), <span class="at">data=</span>advertising)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># show summary of model</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_mlr_int)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = sales ~ TV + radio + (TV * radio), data = advertising)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-6.3366 -0.4028  0.1831  0.5948  1.5246 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 6.750e+00  2.479e-01  27.233   &lt;2e-16 ***
+TV          1.910e-02  1.504e-03  12.699   &lt;2e-16 ***
+radio       2.886e-02  8.905e-03   3.241   0.0014 ** 
+TV:radio    1.086e-03  5.242e-05  20.727   &lt;2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.9435 on 196 degrees of freedom
+Multiple R-squared:  0.9678,    Adjusted R-squared:  0.9673 
+F-statistic:  1963 on 3 and 196 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>The linear model for the above is: <span class="math display">\[Y = \beta_{0} + \beta_{1}\times TV + \beta_{2} \times radio + \beta_{3} \times (radio \times TV) + \epsilon \\
+Y = \beta_{0} + (\beta_{1} + \beta_{3} \times radio)\times TV + \beta_{2} \times radio  + \epsilon
+\]</span></p>
+<p>The slope for the interaction effect can be be interpreted as the increase in the effectiveness of TV advertising associated with a one-unit increase in radio advertising (or vice-versa). The <em>p-values</em> from the model above will give indication of the validity of the interaction effect - a high p-value would indicate that we should reconsider if there is an interaction effect between the selected variables. A low p-value for the interaction term would indicate that there is <em>strong evidence</em> for <span class="math inline">\(H_{a}: \beta_{3} \neq 0\)</span>. Therefore the <strong>true relationship is not additive.</strong></p>
+<p>From the summary above - an increase in TV advertising of 500 is associated with increased sales of <span class="math inline">\((\hat{\beta_{1}} + \hat{\beta_{3}} \times radio) \times 500 = 19.1+ 1.086 \times radio\)</span> units.</p>
+<p><strong>Note</strong> - if the interaction effect has a small p-value and the but the associated <em>main effects</em> do not, based on the <strong>hierarchiacal pricniple</strong> they should be included in the model even though they are not significant.</p>
+<p><strong>questions</strong> 1. Can an interaction effect occur between more than two predictors?</p>
 </section>
 </section>
 </section>

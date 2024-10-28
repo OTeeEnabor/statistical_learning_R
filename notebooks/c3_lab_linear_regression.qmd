@@ -397,3 +397,45 @@ model_house <- lm(Balance ~Own, data=credit)
 summary(model_house)
 ```
 Notice the high *p-value* for the dummy variable, this suggests that there is no statistical evidence of a difference in average credit card balance based on house ownership.
+
+### Extensions of Linear Model
+The linear regression model makes several highly restrictive assumptions that are violated **in practice**.
+The 2 most important assumptions state that the relationship between predictors and response are **additive and linear.**
+
+1. The **additive** assumption means that associations between a predictor $X_j$ and the response $Y$ **does not depend on the values of other predictors.** - confounding variables.
+
+2. The **linearity** assumption states that a $\delta$ in $Y$ associated with a **one-unit change** in $X_j$ is constant, regardless of the value of $X_j$.
+
+However, in practice the *additive* assumption is violated by the occurrence of a *synergy effect* or *interaction effect* - which occur where a change in one of the predictors influences another predictor. For example in the *Advertising* data set, an increase in budget for radio advertising increases the effectiveness of TV advertising - therefore as the slope term $\beta_{TV}$  should have a positive correlation with $\beta_{radio}$. 
+
+Considering the standard linear regression model with two variables:
+$$Y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \epsilon$$
+a **one-unit increase** in $X_{1}$ is associated with an **average increase in Y** of $\beta_{1}$ units. This model is extended when including the *interaction effect* - product of $X_{1}$ and $X_{2}$. The extended model is then:
+$$Y = \beta_{0} + \beta_{1}X_{1} + \beta_{2}X_{2} + \beta_{3}X_{1}X_{2} + \epsilon \\ 
+$$
+$$Y = \beta_{0} + (\beta_{1} + \beta_{3}X_{2})X_{1} + \beta_{2}X_{2}  + \epsilon$$
+
+** Interaction effect with advertising data**
+
+```{r}
+# fit a linear model
+#attach(advertising)
+# fit model with interaction effect
+model_mlr_int <- lm(sales ~ TV+radio +(TV*radio), data=advertising)
+# show summary of model
+summary(model_mlr_int)
+```
+
+The linear model for the above is:
+$$Y = \beta_{0} + \beta_{1}\times TV + \beta_{2} \times radio + \beta_{3} \times (radio \times TV) + \epsilon
+$$
+$$Y = \beta_{0} + (\beta_{1} + \beta_{3} \times radio)\times TV + \beta_{2} \times radio  + \epsilon$$
+
+The slope for the interaction effect can be be interpreted as the increase in the effectiveness of  TV advertising associated with a one-unit increase in radio advertising (or vice-versa). The *p-values* from the model above will give indication of the validity of the interaction effect - a high p-value would indicate that we should reconsider if there is an interaction effect between the selected variables.  A low p-value for the interaction term would indicate that there is *strong evidence* for $H_{a}: \beta_{3} \neq 0$. Therefore the **true relationship is not additive.**
+
+From the summary above - an increase in TV advertising of 500 is associated with increased sales of $(\hat{\beta_{1}} + \hat{\beta_{3}} \times radio) \times 500 = 19.1+ 1.086 \times radio$ units.
+
+**Note** - if the interaction effect has a small p-value and the but the associated *main effects* do not, based on the **hierarchical principle** they should be included in the model even though they are not significant. 
+
+**questions**
+1. Can an interaction effect occur between more than two predictors?

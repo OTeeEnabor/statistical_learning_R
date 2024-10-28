@@ -1,0 +1,91 @@
+---
+title-block-banner: true
+title: "Deep Dive into Linear Regression: Exercises"
+date: 2024-10-14
+date-format: "YYYY-MM-D"
+author: 
+  - name: "Oselu Enabor"
+    orcid: 0000-0003-3813-2474
+    email: oenabor@gmail.com
+license: "CC BY"
+format: 
+  html:
+    toc: true
+    number-sections: true
+    fig-responsive: true
+    fig-width: 8
+    fig-height: 6
+    code-fold: true
+execute: 
+  echo: true
+  warning: false
+editor: visual
+editor_options:
+  chunk_output_type: console
+---
+# load necessary libraries
+```{r}
+library(ISLR)
+library(ISLR2)
+library(ggplot2)
+library(dplyr)
+library(metR)
+#library(plotly)
+```
+
+# Question 8 
+Use simple linear regression on the `Auto` data set.
+a. Use the `lm()` function to perform a single linear regression with `mpg` as the response and `horsepower` as the predictor. Use the `summary()` function to print the results. 
+
+```{r}
+# save the Auto data set to a variable
+auto <- Auto
+# view first observations
+head(auto)
+```
+```{r}
+# create slr model
+model <- lm(mpg ~ horsepower, data=auto)
+# show the summary
+summary(model)
+```
+i. Is there a relationship between the predictor and the response?
+
+Yes there is a negative relationship between `mpg` and `horsepower` - $\beta_{hp} \neq 0$ 
+
+ii. The `t-value` is greater than 0 and *p-value* **is statistically significant**.
+
+ii. The relationship is **negative** and on average a one-unit change in *horsepower* will results in a decrease if 0.157 in mpg.
+
+iv. What is the predicted `mpg` associated with a `horsepower` of 98? What are the associated 95% confidence and prediction intervals?
+```{r}
+# predict mpg with horsepower 98
+# confidence interval
+new_data <- data.frame(horsepower=c(98))
+prediction <- predict(model, newdata = new_data, interval="confidence")
+prediction
+```
+**prediction interval** 
+```{r}
+prediction <- predict(model, newdata = new_data, interval="prediction")
+prediction
+```
+
+
+Plot the response and the predictor. Use the `abline()` function to display the least squares regression line.
+```{r}
+plot(auto$horsepower,auto$mpg, col="red", pch=20)
+# add regression line
+abline(model, col="blue", lwd=2)
+# add residuals as segments
+for (i in 1:nrow(auto)){
+  segments(auto$horsepower[i], auto$mpg[i], auto$horsepower[i], fitted(model)[i], col="gray", lty=2)
+}
+```
+
+Plot diagnostic plots of the least squares regression fit. 
+```{r}
+par(mfrow=c(2,2))
+plot(model)
+```
+
